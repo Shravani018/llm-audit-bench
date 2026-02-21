@@ -20,5 +20,5 @@ A modular pipeline that audits 5 small HuggingFace LLMs across transparency, fai
 - Fetched architecture and metadata via AutoConfig
 - Saved to results/model_metadata.json
 
-**02_transparency_score_ipynb** *(in progress)* 
+**02_transparency_score.ipynb** *(in progress)* 
 - Scores each model's model card against completeness criteria.
