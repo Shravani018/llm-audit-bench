@@ -1,0 +1,69 @@
+{
+  "transparency": [
+    {
+      "model_id": "gpt2",
+      "checks": {
+        "has_model_card": true,
+        "license": true,
+        "training_data": true,
+        "limitations": true,
+        "intended_use": true,
+        "evaluation_results": true,
+        "carbon_footprint": false
+      },
+      "score": 0.9
+    },
+    {
+      "model_id": "distilgpt2",
+      "checks": {
+        "has_model_card": true,
+        "license": true,
+        "training_data": true,
+        "limitations": true,
+        "intended_use": true,
+        "evaluation_results": true,
+        "carbon_footprint": true
+      },
+      "score": 1.0
+    },
+    {
+      "model_id": "facebook/opt-125m",
+      "checks": {
+        "has_model_card": true,
+        "license": true,
+        "training_data": true,
+        "limitations": true,
+        "intended_use": true,
+        "evaluation_results": true,
+        "carbon_footprint": false
+      },
+      "score": 0.9
+    },
+    {
+      "model_id": "EleutherAI/gpt-neo-125m",
+      "checks": {
+        "has_model_card": true,
+        "license": true,
+        "training_data": true,
+        "limitations": true,
+        "intended_use": true,
+        "evaluation_results": true,
+        "carbon_footprint": false
+      },
+      "score": 0.9
+    },
+    {
+      "model_id": "bigscience/bloom-560m",
+      "checks": {
+        "has_model_card": true,
+        "license": true,
+        "training_data": true,
+        "limitations": true,
+        "intended_use": true,
+        "evaluation_results": true,
+        "carbon_footprint": true
+      },
+      "score": 1.0
+    }
+  ]
+}
