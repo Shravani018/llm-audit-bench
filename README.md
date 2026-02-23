@@ -21,4 +21,8 @@ A modular pipeline that audits 5 small HuggingFace LLMs across transparency, fai
 - Saved to results/model_metadata.json
 
 **02_transparency_score.ipynb** *(in progress)* 
-- Scores each model's model card against completeness criteria.
+- Scores completeness against 7 criteria: license, training data, limitations, intended use, evaluation results, carbon footprint, and card existence
+- Each criterion is binary (present / not present) with a defined weight
+- Produces a transparency score between 0 and 1 per model
+
+
