@@ -20,9 +20,13 @@ A modular pipeline that audits 5 small HuggingFace LLMs across transparency, fai
 - Fetched architecture and metadata via AutoConfig
 - Saved to results/model_metadata.json
 
-**02_transparency_score.ipynb** *(in progress)* 
+**02_transparency_score.ipynb**
 - Scores completeness against 7 criteria: license, training data, limitations, intended use, evaluation results, carbon footprint, and card existence
 - Each criterion is binary (present / not present) with a defined weight
 - Produces a transparency score between 0 and 1 per model
 
+**03_fairness_score.ipynb** *(in progress)*
+- Measures stereotype bias across 5 demographic categories using CrowS-Pairs
+- Compares log-probabilities of stereotyped vs anti-stereotyped sentence pairs
+- Produces a fairness score between 0 and 1 per model
 
