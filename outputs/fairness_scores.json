@@ -1,0 +1,269 @@
+{
+  "fairness": [
+    {
+      "model_id": "gpt2",
+      "fairness_score": 0.42,
+      "bias_score": 0.58,
+      "total_pairs": 1508,
+      "per_category": {
+        "race-color": {
+          "bias_score": 0.52,
+          "fairness_score": 0.48,
+          "pairs_evaluated": 516
+        },
+        "socioeconomic": {
+          "bias_score": 0.64,
+          "fairness_score": 0.36,
+          "pairs_evaluated": 172
+        },
+        "gender": {
+          "bias_score": 0.61,
+          "fairness_score": 0.39,
+          "pairs_evaluated": 262
+        },
+        "disability": {
+          "bias_score": 0.62,
+          "fairness_score": 0.38,
+          "pairs_evaluated": 60
+        },
+        "nationality": {
+          "bias_score": 0.47,
+          "fairness_score": 0.53,
+          "pairs_evaluated": 159
+        },
+        "sexual-orientation": {
+          "bias_score": 0.8,
+          "fairness_score": 0.2,
+          "pairs_evaluated": 84
+        },
+        "physical-appearance": {
+          "bias_score": 0.65,
+          "fairness_score": 0.35,
+          "pairs_evaluated": 63
+        },
+        "religion": {
+          "bias_score": 0.64,
+          "fairness_score": 0.36,
+          "pairs_evaluated": 105
+        },
+        "age": {
+          "bias_score": 0.54,
+          "fairness_score": 0.46,
+          "pairs_evaluated": 87
+        }
+      }
+    },
+    {
+      "model_id": "distilgpt2",
+      "fairness_score": 0.44,
+      "bias_score": 0.56,
+      "total_pairs": 1508,
+      "per_category": {
+        "race-color": {
+          "bias_score": 0.5,
+          "fairness_score": 0.5,
+          "pairs_evaluated": 516
+        },
+        "socioeconomic": {
+          "bias_score": 0.65,
+          "fairness_score": 0.35,
+          "pairs_evaluated": 172
+        },
+        "gender": {
+          "bias_score": 0.57,
+          "fairness_score": 0.43,
+          "pairs_evaluated": 262
+        },
+        "disability": {
+          "bias_score": 0.58,
+          "fairness_score": 0.42,
+          "pairs_evaluated": 60
+        },
+        "nationality": {
+          "bias_score": 0.44,
+          "fairness_score": 0.56,
+          "pairs_evaluated": 159
+        },
+        "sexual-orientation": {
+          "bias_score": 0.79,
+          "fairness_score": 0.21,
+          "pairs_evaluated": 84
+        },
+        "physical-appearance": {
+          "bias_score": 0.65,
+          "fairness_score": 0.35,
+          "pairs_evaluated": 63
+        },
+        "religion": {
+          "bias_score": 0.61,
+          "fairness_score": 0.39,
+          "pairs_evaluated": 105
+        },
+        "age": {
+          "bias_score": 0.53,
+          "fairness_score": 0.47,
+          "pairs_evaluated": 87
+        }
+      }
+    },
+    {
+      "model_id": "facebook/opt-125m",
+      "fairness_score": 0.43,
+      "bias_score": 0.57,
+      "total_pairs": 1508,
+      "per_category": {
+        "race-color": {
+          "bias_score": 0.54,
+          "fairness_score": 0.46,
+          "pairs_evaluated": 516
+        },
+        "socioeconomic": {
+          "bias_score": 0.55,
+          "fairness_score": 0.45,
+          "pairs_evaluated": 172
+        },
+        "gender": {
+          "bias_score": 0.58,
+          "fairness_score": 0.42,
+          "pairs_evaluated": 262
+        },
+        "disability": {
+          "bias_score": 0.67,
+          "fairness_score": 0.33,
+          "pairs_evaluated": 60
+        },
+        "nationality": {
+          "bias_score": 0.47,
+          "fairness_score": 0.53,
+          "pairs_evaluated": 159
+        },
+        "sexual-orientation": {
+          "bias_score": 0.69,
+          "fairness_score": 0.31,
+          "pairs_evaluated": 84
+        },
+        "physical-appearance": {
+          "bias_score": 0.68,
+          "fairness_score": 0.32,
+          "pairs_evaluated": 63
+        },
+        "religion": {
+          "bias_score": 0.64,
+          "fairness_score": 0.36,
+          "pairs_evaluated": 105
+        },
+        "age": {
+          "bias_score": 0.59,
+          "fairness_score": 0.41,
+          "pairs_evaluated": 87
+        }
+      }
+    },
+    {
+      "model_id": "EleutherAI/gpt-neo-125m",
+      "fairness_score": 0.46,
+      "bias_score": 0.54,
+      "total_pairs": 1508,
+      "per_category": {
+        "race-color": {
+          "bias_score": 0.46,
+          "fairness_score": 0.54,
+          "pairs_evaluated": 516
+        },
+        "socioeconomic": {
+          "bias_score": 0.6,
+          "fairness_score": 0.4,
+          "pairs_evaluated": 172
+        },
+        "gender": {
+          "bias_score": 0.61,
+          "fairness_score": 0.39,
+          "pairs_evaluated": 262
+        },
+        "disability": {
+          "bias_score": 0.55,
+          "fairness_score": 0.45,
+          "pairs_evaluated": 60
+        },
+        "nationality": {
+          "bias_score": 0.39,
+          "fairness_score": 0.61,
+          "pairs_evaluated": 159
+        },
+        "sexual-orientation": {
+          "bias_score": 0.8,
+          "fairness_score": 0.2,
+          "pairs_evaluated": 84
+        },
+        "physical-appearance": {
+          "bias_score": 0.62,
+          "fairness_score": 0.38,
+          "pairs_evaluated": 63
+        },
+        "religion": {
+          "bias_score": 0.57,
+          "fairness_score": 0.43,
+          "pairs_evaluated": 105
+        },
+        "age": {
+          "bias_score": 0.59,
+          "fairness_score": 0.41,
+          "pairs_evaluated": 87
+        }
+      }
+    },
+    {
+      "model_id": "bigscience/bloom-560m",
+      "fairness_score": 0.44,
+      "bias_score": 0.56,
+      "total_pairs": 1508,
+      "per_category": {
+        "race-color": {
+          "bias_score": 0.51,
+          "fairness_score": 0.49,
+          "pairs_evaluated": 516
+        },
+        "socioeconomic": {
+          "bias_score": 0.67,
+          "fairness_score": 0.33,
+          "pairs_evaluated": 172
+        },
+        "gender": {
+          "bias_score": 0.6,
+          "fairness_score": 0.4,
+          "pairs_evaluated": 262
+        },
+        "disability": {
+          "bias_score": 0.62,
+          "fairness_score": 0.38,
+          "pairs_evaluated": 60
+        },
+        "nationality": {
+          "bias_score": 0.45,
+          "fairness_score": 0.55,
+          "pairs_evaluated": 159
+        },
+        "sexual-orientation": {
+          "bias_score": 0.75,
+          "fairness_score": 0.25,
+          "pairs_evaluated": 84
+        },
+        "physical-appearance": {
+          "bias_score": 0.57,
+          "fairness_score": 0.43,
+          "pairs_evaluated": 63
+        },
+        "religion": {
+          "bias_score": 0.45,
+          "fairness_score": 0.55,
+          "pairs_evaluated": 105
+        },
+        "age": {
+          "bias_score": 0.56,
+          "fairness_score": 0.44,
+          "pairs_evaluated": 87
+        }
+      }
+    }
+  ]
+}
