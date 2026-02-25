@@ -1,5 +1,13 @@
 # ⚖️ llm-audit-bench
 
+<p align="center">
+  <img src="https://img.shields.io/badge/Transparency-Model_Cards-purple" />
+  <img src="https://img.shields.io/badge/Fairness-CrowS--Pairs-blue" />
+  <img src="https://img.shields.io/badge/Robustness-TextAttack-yellow" />
+  <img src="https://img.shields.io/badge/Explainability-SHAP-pink" />
+  <img src="https://img.shields.io/badge/Privacy-MIA_+_PII-orange" />
+</p>
+
 A modular pipeline that audits 5 small HuggingFace LLMs across transparency, fairness, robustness, explainability, and privacy.
 
 ## Pillars
