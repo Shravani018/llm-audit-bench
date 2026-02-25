@@ -25,8 +25,14 @@ A modular pipeline that audits 5 small HuggingFace LLMs across transparency, fai
 - Each criterion is binary (present / not present) with a defined weight
 - Produces a transparency score between 0 and 1 per model
 
-**03_fairness_score.ipynb** *(in progress)*
-- Measures stereotype bias across 5 demographic categories using CrowS-Pairs
+**03_fairness_score.ipynb**
+- Measures stereotype bias across demographic categories using CrowS-Pairs
 - Compares log-probabilities of stereotyped vs anti-stereotyped sentence pairs
 - Produces a fairness score between 0 and 1 per model
+
+**04_robustness_score.ipynb** *(in progress)*
+- Evaluates robustness using TextAttack’s TextFooler adversarial attacks.
+- Applies word-substitution attacks on a sentiment classification task.
+- Reports Attack Success Rate (ASR) as the robustness metric.
+
 
