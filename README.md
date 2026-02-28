@@ -1,10 +1,9 @@
 # ⚖️ llm-audit-bench
-
 <p align="center">
   <img src="https://img.shields.io/badge/Transparency-Model_Cards-purple" />
   <img src="https://img.shields.io/badge/Fairness-CrowS--Pairs-blue" />
-  <img src="https://img.shields.io/badge/Robustness-TextAttack-yellow" />
-  <img src="https://img.shields.io/badge/Explainability-SHAP-pink" />
+  <img src="https://img.shields.io/badge/Robustness-Perplexity_Shift-pink" />
+  <img src="https://img.shields.io/badge/Explainability-SHAP-navy" />
   <img src="https://img.shields.io/badge/Privacy-MIA_+_PII-orange" />
 </p>
 
@@ -15,7 +14,7 @@ A modular pipeline that audits 5 small HuggingFace LLMs across transparency, fai
 |---|---|
 | Transparency | Model card completeness scoring |
 | Fairness | CrowS-Pairs stereotype bias test |
-| Robustness | TextAttack adversarial attacks |
+| Robustness | Perplexity shift under input perturbations |
 | Explainability | SHAP token attribution |
 | Privacy | MIA canary test + PII generation risk |
 
@@ -25,21 +24,23 @@ A modular pipeline that audits 5 small HuggingFace LLMs across transparency, fai
 ## Status
 
 **01_extracting_metadata.ipynb**
-- Fetched architecture and metadata via AutoConfig.
+- Fetched architecture and metadata via AutoConfig
 - Saved to results/model_metadata.json
 
 **02_transparency_score.ipynb**
-- Scores completeness against 7 criteria: license, training data, limitations, intended use, evaluation results, carbon footprint, and card existence.
-- Each criterion is binary (present / not present) with a defined weight
-- Produces a transparency score between 0 and 1 per model.
+- Scored completeness against 7 criteria: license, training data, limitations, intended use, evaluation results, carbon footprint, and card existence
+- Each criterion is binary with a defined weight, producing a score between 0 and 1 per model
 
 **03_fairness_score.ipynb**
-- Measures stereotype bias across demographic categories using CrowS-Pairs.
-- Compares log-probabilities of stereotyped vs anti-stereotyped sentence pairs.
-- Produces a fairness score between 0 and 1 per model.
+- Measures stereotype bias across 9 demographic categories using CrowS-Pairs across 1508 sentence pairs
+- Compares log-probabilities of stereotyped vs anti-stereotyped sentence pairs
+- Produces a fairness score between 0 and 1 per model
 
-**04_robustness_score.ipynb** *(in progress)*
-- Evaluates robustness by measuring perplexity shift under 4 input perturbations: typo, word deletion, synonym substitution, and word shuffle
-- Uses 100 sentences from SST-2 and computes how much each model's output probability changes when inputs are slightly corrupted
-- Robustness score = 1 - mean normalised perplexity shift across typo, deletion, and synonym perturbations
+**04_robustness_score.ipynb**
+- Evaluates robustness by measuring perplexity shift under 3 input perturbations: typo, word deletion, and synonym substitution
+- Uses 100 sentences from SST-2 and computes how much each model's output probability changes under slightly corrupted inputs
+- Robustness score = 1 - mean normalised perplexity shift across all three perturbation types
 
+**05_explainability_score.ipynb** *(in progress)*
+- Measures token-level importance using SHAP attribution over 100 SST-2 sentences per model
+- Explainability score derived from attribution concentration, a focused model assigns high importance to fewer, more meaningful tokens rather than spreading attribution uniformly
