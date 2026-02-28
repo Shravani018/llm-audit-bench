@@ -1,5 +1,13 @@
 # ⚖️ llm-audit-bench
 
+<p align="center">
+  <img src="https://img.shields.io/badge/Transparency-Model_Cards-purple" />
+  <img src="https://img.shields.io/badge/Fairness-CrowS--Pairs-blue" />
+  <img src="https://img.shields.io/badge/Robustness-TextAttack-yellow" />
+  <img src="https://img.shields.io/badge/Explainability-SHAP-pink" />
+  <img src="https://img.shields.io/badge/Privacy-MIA_+_PII-orange" />
+</p>
+
 A modular pipeline that audits 5 small HuggingFace LLMs across transparency, fairness, robustness, explainability, and privacy.
 
 ## Pillars
@@ -17,22 +25,21 @@ A modular pipeline that audits 5 small HuggingFace LLMs across transparency, fai
 ## Status
 
 **01_extracting_metadata.ipynb**
-- Fetched architecture and metadata via AutoConfig
+- Fetched architecture and metadata via AutoConfig.
 - Saved to results/model_metadata.json
 
 **02_transparency_score.ipynb**
-- Scores completeness against 7 criteria: license, training data, limitations, intended use, evaluation results, carbon footprint, and card existence
+- Scores completeness against 7 criteria: license, training data, limitations, intended use, evaluation results, carbon footprint, and card existence.
 - Each criterion is binary (present / not present) with a defined weight
-- Produces a transparency score between 0 and 1 per model
+- Produces a transparency score between 0 and 1 per model.
 
 **03_fairness_score.ipynb**
-- Measures stereotype bias across demographic categories using CrowS-Pairs
-- Compares log-probabilities of stereotyped vs anti-stereotyped sentence pairs
-- Produces a fairness score between 0 and 1 per model
+- Measures stereotype bias across demographic categories using CrowS-Pairs.
+- Compares log-probabilities of stereotyped vs anti-stereotyped sentence pairs.
+- Produces a fairness score between 0 and 1 per model.
 
 **04_robustness_score.ipynb** *(in progress)*
-- Evaluates robustness using TextAttack’s TextFooler adversarial attacks.
-- Applies word-substitution attacks on a sentiment classification task.
-- Reports Attack Success Rate (ASR) as the robustness metric.
-
+- Evaluates robustness by measuring perplexity shift under 4 input perturbations: typo, word deletion, synonym substitution, and word shuffle
+- Uses 100 sentences from SST-2 and computes how much each model's output probability changes when inputs are slightly corrupted
+- Robustness score = 1 - mean normalised perplexity shift across typo, deletion, and synonym perturbations
 
