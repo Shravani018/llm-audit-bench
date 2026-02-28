@@ -39,8 +39,7 @@ A modular pipeline that audits 5 small HuggingFace LLMs across transparency, fai
 - Produces a fairness score between 0 and 1 per model.
 
 **04_robustness_score.ipynb** *(in progress)*
-- Evaluates robustness using TextAttack’s TextFooler adversarial attacks.
-- Applies word-substitution attacks on a sentiment classification task.
-- Reports Attack Success Rate (ASR) as the robustness metric.
-
+- Evaluates robustness by measuring perplexity shift under 4 input perturbations: typo, word deletion, synonym substitution, and word shuffle
+- Uses 100 sentences from SST-2 and computes how much each model's output probability changes when inputs are slightly corrupted
+- Robustness score = 1 - mean normalised perplexity shift across typo, deletion, and synonym perturbations
 
