@@ -1,0 +1,59 @@
+{
+  "robustness": [
+    {
+      "model_id": "gpt2",
+      "robustness_score": 0.4577,
+      "mean_shift": 0.5423,
+      "sentences_tested": 100,
+      "per_perturbation": {
+        "typo": 0.3625,
+        "deletion": 0.4892,
+        "synonym": 0.5213
+      }
+    },
+    {
+      "model_id": "distilgpt2",
+      "robustness_score": 0.4535,
+      "mean_shift": 0.5465,
+      "sentences_tested": 100,
+      "per_perturbation": {
+        "typo": 0.2557,
+        "deletion": 0.4658,
+        "synonym": 0.6389
+      }
+    },
+    {
+      "model_id": "facebook/opt-125m",
+      "robustness_score": 0.201,
+      "mean_shift": 0.799,
+      "sentences_tested": 100,
+      "per_perturbation": {
+        "typo": 0.0186,
+        "deletion": 0.4343,
+        "synonym": 0.1503
+      }
+    },
+    {
+      "model_id": "EleutherAI/gpt-neo-125m",
+      "robustness_score": 0.3278,
+      "mean_shift": 0.6722,
+      "sentences_tested": 100,
+      "per_perturbation": {
+        "typo": 0.2035,
+        "deletion": 0.3312,
+        "synonym": 0.4486
+      }
+    },
+    {
+      "model_id": "bigscience/bloom-560m",
+      "robustness_score": 0.0,
+      "mean_shift": 4.6668,
+      "sentences_tested": 100,
+      "per_perturbation": {
+        "typo": 0.0,
+        "deletion": 0.638,
+        "synonym": 0.7409
+      }
+    }
+  ]
+}
