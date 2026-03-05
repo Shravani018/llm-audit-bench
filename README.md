@@ -23,7 +23,7 @@ A modular pipeline that audits 5 small HuggingFace LLMs across transparency, fai
 
 `gpt2` `distilgpt2` `facebook/opt-125m` `EleutherAI/gpt-neo-125m` `bigscience/bloom-560m`
 ## Dashboard
-[View live dashboard](https://shravani018.github.io/llm-audit-bench/)
+[View dashboard](https://shravani018.github.io/llm-audit-bench/)
 ## Notebooks
 
 **01_extracting_metadata.ipynb**
