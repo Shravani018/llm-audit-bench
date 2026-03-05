@@ -10,6 +10,7 @@
 A modular pipeline that audits 5 small HuggingFace LLMs across transparency, fairness, robustness, explainability, and privacy.
 
 ## Pillars
+
 | Pillar | Method |
 |---|---|
 | Transparency | Model card completeness scoring |
@@ -19,16 +20,17 @@ A modular pipeline that audits 5 small HuggingFace LLMs across transparency, fai
 | Privacy | MIA canary test + PII generation risk |
 
 ## Models
+
 `gpt2` `distilgpt2` `facebook/opt-125m` `EleutherAI/gpt-neo-125m` `bigscience/bloom-560m`
 
-## Status
+## Notebooks
 
 **01_extracting_metadata.ipynb**
-- Fetched architecture and metadata via AutoConfig
-- Saved to results/model_metadata.json
+- Fetches architecture and metadata via AutoConfig
+- Saves to results/model_metadata.json
 
 **02_transparency_score.ipynb**
-- Scored completeness against 7 criteria: license, training data, limitations, intended use, evaluation results, carbon footprint, and card existence
+- Scores completeness against 7 criteria: license, training data, limitations, intended use, evaluation results, carbon footprint, and card existence
 - Each criterion is binary with a defined weight, producing a score between 0 and 1 per model
 
 **03_fairness_score.ipynb**
@@ -39,16 +41,19 @@ A modular pipeline that audits 5 small HuggingFace LLMs across transparency, fai
 **04_robustness_score.ipynb**
 - Evaluates robustness by measuring perplexity shift under 3 input perturbations: typo, word deletion, and synonym substitution
 - Uses 100 sentences from SST-2 and computes how much each model's output probability changes under slightly corrupted inputs
-- Robustness score = 1 - mean normalised perplexity shift across all three perturbation types
+- Robustness score = 1 minus mean normalised perplexity shift across all three perturbation types
 
-**05_explainability_score.ipynb** 
+**05_explainability_score.ipynb**
 - Measures token-level importance using SHAP attribution over 25 SST-2 sentences per model (nsamples=50, max_length=32)
-- Explainability score derived from attribution concentration, a focused model assigns high importance to fewer, more meaningful tokens rather than spreading attribution uniformly
+- Explainability score derived from attribution concentration — a focused model assigns high importance to fewer, more meaningful tokens rather than spreading attribution uniformly
 
-**06_privacy_score.ipynb** 
-- Evaluates privacy risk across two axes: MIA canary susceptibility (does the model assign higher likelihood to synthetic canary strings it has seen in context?) and PII generation risk (does the model complete partial names, emails, or phone numbers with plausible real-looking outputs?)
-- Privacy score = 1 - normalised risk across both axes, where a higher score indicates a more privacy-preserving model
+**06_privacy_score.ipynb**
+- Evaluates privacy risk across two axes: MIA canary susceptibility and PII generation risk
+- Privacy score = 1 minus normalised risk across both axes, where a higher score indicates a more privacy-preserving model
 
-**07_visualization.ipynb** *(in progress)*
-- Aggregates all 5 pillar scores into a weighted trustworthiness index per model (fairness 25%, robustness 25%, explainability 20%, transparency 15%, privacy 15%)
-- Renders an interactive Plotly dashboard with a ranked leaderboard table, radar chart, grouped bar comparisons, heatmap, and per-pillar breakdowns for fairness and robustness
+**07_aggregate_scores.ipynb**
+- Aggregates all 5 pillar score JSONs into a single weighted trustworthiness index per model
+- Weighted trust index: fairness 25%, robustness 25%, explainability 20%, transparency 15%, privacy 15%
+
+**08_dashboard.html**
+- Visualising trustworthiness dashboard covering privacy, fairness, robustness, transparency, explainability, and a full radar overview
