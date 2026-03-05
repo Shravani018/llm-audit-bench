@@ -45,6 +45,10 @@ A modular pipeline that audits 5 small HuggingFace LLMs across transparency, fai
 - Measures token-level importance using SHAP attribution over 25 SST-2 sentences per model (nsamples=50, max_length=32)
 - Explainability score derived from attribution concentration, a focused model assigns high importance to fewer, more meaningful tokens rather than spreading attribution uniformly
 
-**06_privacy_score.ipynb** *(in progress)*
+**06_privacy_score.ipynb** 
 - Evaluates privacy risk across two axes: MIA canary susceptibility (does the model assign higher likelihood to synthetic canary strings it has seen in context?) and PII generation risk (does the model complete partial names, emails, or phone numbers with plausible real-looking outputs?)
 - Privacy score = 1 - normalised risk across both axes, where a higher score indicates a more privacy-preserving model
+
+**07_aggregate_scores.ipynb** *(in progress)*
+- Aggregates all 5 pillar scores into a weighted trustworthiness index per model (fairness 25%, robustness 25%, explainability 20%, transparency 15%, privacy 15%)
+- Renders an interactive Plotly dashboard with a ranked leaderboard table, radar chart, grouped bar comparisons, heatmap, and per-pillar breakdowns for fairness and robustness
