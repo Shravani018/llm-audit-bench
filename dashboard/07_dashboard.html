@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>LLM Audit Bench: Trustworthiness Dashboard</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/plotly.js/2.27.0/plotly.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,400&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<style>
+  :root {
+    --bg:       #f4f7fc;
+    --surface:  #ffffff;
+    --border:   #e2e8f4;
+    --blue:     #1a56db;
+    --blue-lt:  #dbeafe;
+    --red:      #dc2626;
+    --red-lt:   #fee2e2;
+    --amber:    #d97706;
+    --amber-lt: #fef3c7;
+    --green:    #059669;
+    --green-lt: #d1fae5;
+    --text-1:   #0f172a;
+    --text-2:   #475569;
+    --text-3:   #94a3b8;
+    --radius:   14px;
+    --shadow:   0 1px 4px rgba(15,23,42,.07), 0 6px 20px rgba(15,23,42,.06);
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text-1); }
+
+  /* ── Header ── */
+  header {
+    background: var(--surface); border-bottom: 1px solid var(--border);
+    padding: 0 48px; display: flex; align-items: center; justify-content: space-between;
+    height: 64px; position: sticky; top: 0; z-index: 100;
+  }
+  .brand { display: flex; align-items: center; gap: 12px; }
+  .brand-icon {
+    width: 34px; height: 34px; background: var(--blue); border-radius: 9px;
+    display: flex; align-items: center; justify-content: center; color: #fff; font-size: 16px;
+  }
+  .brand-name { font-size: 15px; font-weight: 600; letter-spacing: -.01em; }
+  .brand-sub  { font-size: 11px; color: var(--text-3); font-family: 'DM Mono', monospace; text-transform: uppercase; letter-spacing: .05em; }
+  .chips { display: flex; gap: 8px; }
+  .chip { background: var(--blue-lt); color: var(--blue); font-size: 11px; font-weight: 500; padding: 4px 10px; border-radius: 20px; font-family: 'DM Mono', monospace; }
+
+  /* ── Layout ── */
+  main { max-width: 1300px; margin: 0 auto; padding: 36px 36px 72px; display: flex; flex-direction: column; gap: 20px; }
+
+  /* ── Score strip ── */
+  .score-strip { display: grid; grid-template-columns: repeat(5,1fr); gap: 12px; }
+  .score-card {
+    background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
+    padding: 18px 20px; box-shadow: var(--shadow); position: relative; overflow: hidden;
+  }
+  .score-card::after {
+    content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: var(--c);
+  }
+  .sc-label { font-size: 11px; font-weight: 600; color: var(--text-3); font-family: 'DM Mono', monospace; margin-bottom: 5px; }
+  .sc-value { font-size: 26px; font-weight: 600; color: var(--c); letter-spacing: -.02em; line-height: 1; }
+  .sc-rank  { font-size: 11px; color: var(--text-3); margin-top: 3px; }
+
+  /* ── Chart grid ── */
+  .grid-top    { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; }
+  .grid-bottom { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 0; }
+
+  /* ── Story card ── */
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); display: flex; flex-direction: column; }
+  .card-story {
+    padding: 22px 24px 14px;
+    border-bottom: 1px solid var(--border);
+  }
+  .story-eyebrow {
+    font-size: 10px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase;
+    color: var(--text-3); font-family: 'DM Mono', monospace; margin-bottom: 6px;
+  }
+  .story-headline {
+    font-size: 15px; font-weight: 600; color: var(--text-1); line-height: 1.35;
+    letter-spacing: -.01em;
+  }
+  .story-headline em { font-style: normal; }
+  .story-sub {
+    font-size: 12px; color: var(--text-2); margin-top: 5px; line-height: 1.5;
+  }
+  .chart-area { padding: 8px; flex: 1; }
+
+  /* ── Checklist grid (transparency) ── */
+  .check-grid {
+    display: grid; grid-template-columns: repeat(7,1fr); gap: 6px;
+    padding: 20px 20px 24px;
+  }
+  .check-col { display: flex; flex-direction: column; gap: 4px; }
+  .check-header {
+    font-size: 9px; font-weight: 600; text-transform: uppercase; letter-spacing: .05em;
+    color: var(--text-3); text-align: center; padding-bottom: 6px; line-height: 1.3;
+    height: 36px; display: flex; align-items: flex-end; justify-content: center;
+  }
+  .check-row-label {
+    font-size: 11px; font-family: 'DM Mono', monospace; color: var(--text-2);
+    display: flex; align-items: center; height: 36px; padding-right: 8px; white-space: nowrap;
+  }
+  .check-cell {
+    height: 36px; border-radius: 6px; display: flex; align-items: center; justify-content: center;
+    font-size: 14px; font-weight: 600;
+  }
+  .check-cell.yes { background: #d1fae5; color: #059669; }
+  .check-cell.no  { background: #fee2e2; color: #dc2626; }
+
+  /* ── Risk badge ── */
+  .risk-row { display: flex; flex-direction: column; gap: 10px; padding: 16px 20px 20px; }
+  .risk-item {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 12px 16px; border-radius: 10px; border: 1.5px solid var(--border);
+  }
+  .risk-item.safe   { background: var(--green-lt); border-color: #a7f3d0; }
+  .risk-item.warn   { background: var(--amber-lt); border-color: #fcd34d; }
+  .risk-item.danger { background: var(--red-lt);   border-color: #fca5a5; }
+  .risk-model { font-size: 13px; font-weight: 600; font-family: 'DM Mono', monospace; }
+  .risk-model.safe   { color: var(--green); }
+  .risk-model.warn   { color: var(--amber); }
+  .risk-model.danger { color: var(--red); }
+  .risk-right { display: flex; align-items: center; gap: 10px; }
+  .risk-label { font-size: 11px; color: var(--text-3); text-align: right; line-height: 1.3; }
+  .risk-badge {
+    font-size: 13px; font-weight: 700; font-family: 'DM Mono', monospace;
+    min-width: 48px; text-align: right;
+  }
+  .risk-badge.safe   { color: var(--green); }
+  .risk-badge.warn   { color: var(--amber); }
+  .risk-badge.danger { color: var(--red); }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="brand">
+    <div class="brand-icon">⚖</div>
+    <div>
+      <div class="brand-name">llm-audit-bench</div>
+      <div class="brand-sub">Trustworthiness Dashboard</div>
+    </div>
+  </div>
+  <div class="chips">
+    <span class="chip">5 models</span>
+    <span class="chip">5 pillars</span>
+  </div>
+</header>
+
+<main>
+
+  <!-- Score strip -->
+  <div class="score-strip" id="score-strip"></div>
+
+  <!-- Row 1: Privacy | Fairness | Robustness -->
+  <div class="grid-top">
+
+    <!-- Privacy -->
+    <div class="card">
+      <div class="card-story">
+        <div class="story-eyebrow">Privacy</div>
+        <div class="story-headline">GPT-2 generates <em style="color:var(--red)">real-looking PII</em> on 1 in 5 prompts: others are clean</div>
+        <div class="story-sub">Zero memorisation across all models: risk is generative, not leakage</div>
+      </div>
+      <div id="risk-row" class="risk-row" style="padding:16px 20px 20px;flex:1;"></div>
+    </div>
+
+    <!-- Fairness -->
+    <div class="card">
+      <div class="card-story">
+        <div class="story-eyebrow">Fairness</div>
+        <div class="story-headline">Sexual orientation bias is the <em style="color:var(--red)">worst blind spot</em>: all models score below 0.25</div>
+        <div class="story-sub">Every model scores below random chance on this category</div>
+      </div>
+      <div class="chart-area" id="chart-fairness"></div>
+    </div>
+
+    <!-- Robustness -->
+    <div class="card">
+      <div class="card-story">
+        <div class="story-eyebrow">Robustness</div>
+        <div class="story-headline">BLOOM and OPT <em style="color:var(--red)">collapse on typos</em>: GPT-2 family holds steady</div>
+        <div class="story-sub">A single character swap is enough to derail BLOOM completely</div>
+      </div>
+      <div class="chart-area" id="chart-robustness"></div>
+    </div>
+
+  </div>
+
+  <!-- Row 2: Transparency | Explainability -->
+  <div class="grid-bottom">
+
+    <!-- Transparency checklist -->
+    <div class="card">
+      <div class="card-story">
+        <div class="story-eyebrow">Transparency</div>
+        <div class="story-headline">Only 2 of 5 models disclose <em style="color:var(--amber)">carbon footprint</em>: the hardest criterion to meet</div>
+        <div class="story-sub">All models pass the other 6 criteria: carbon is the consistent gap</div>
+      </div>
+      <div id="check-grid" class="check-grid" style="flex:1;align-content:start"></div>
+    </div>
+
+    <!-- Explainability -->
+    <div class="card">
+      <div class="card-story">
+        <div class="story-eyebrow">Explainability</div>
+        <div class="story-headline">BLOOM focuses attribution on <em style="color:var(--blue)">fewer, sharper tokens</em> than any other model</div>
+        <div class="story-sub">Higher Gini = more concentrated attribution = more interpretable decisions</div>
+      </div>
+      <div class="chart-area" id="chart-explain"></div>
+    </div>
+
+  </div>
+
+  <!-- Row 3: Radar full width -->
+  <div class="card">
+    <div class="card-story">
+      <div class="story-eyebrow">Overview</div>
+      <div class="story-headline">No model excels across all pillars: every profile has a visible gap</div>
+      <div class="story-sub">Robustness and fairness drag every model below 0.5 — transparency and privacy are where scores recover</div>
+    </div>
+    <div class="chart-area" id="chart-radar"></div>
+  </div>
+
+</main>
+
+<script>
+// ── Data ─────────────────────────────────────────────────────────────────
+const MODELS  = ['gpt2','distilgpt2','facebook/opt-125m','EleutherAI/gpt-neo-125m','bigscience/bloom-560m'];
+const SHORT   = {'gpt2':'GPT-2','distilgpt2':'DistilGPT-2','facebook/opt-125m':'OPT-125m','EleutherAI/gpt-neo-125m':'GPT-Neo','bigscience/bloom-560m':'BLOOM-560m'};
+const PILLARS = ['transparency','fairness','robustness','explainability','privacy'];
+const WEIGHTS = {transparency:0.15,fairness:0.25,robustness:0.25,explainability:0.20,privacy:0.15};
+const PALETTE = ['#1a56db','#0891b2','#7c3aed','#059669','#d97706'];
+
+const DATA = {
+  transparency:   {'gpt2':0.9,'distilgpt2':1.0,'facebook/opt-125m':0.9,'EleutherAI/gpt-neo-125m':0.9,'bigscience/bloom-560m':1.0},
+  fairness:       {'gpt2':0.42,'distilgpt2':0.44,'facebook/opt-125m':0.43,'EleutherAI/gpt-neo-125m':0.46,'bigscience/bloom-560m':0.44},
+  robustness:     {'gpt2':0.4577,'distilgpt2':0.4535,'facebook/opt-125m':0.201,'EleutherAI/gpt-neo-125m':0.3278,'bigscience/bloom-560m':0.0},
+  explainability: {'gpt2':0.4618,'distilgpt2':0.4711,'facebook/opt-125m':0.4434,'EleutherAI/gpt-neo-125m':0.461,'bigscience/bloom-560m':0.501},
+  privacy:        {'gpt2':0.9,'distilgpt2':0.925,'facebook/opt-125m':1.0,'EleutherAI/gpt-neo-125m':1.0,'bigscience/bloom-560m':1.0},
+  fairness_cats: {
+    labels: ['Race','Socioec.','Gender','Disability','Nationality','Sexual\nOrient.','Appearance','Religion','Age'],
+    'gpt2':                    [0.48,0.36,0.39,0.38,0.53,0.20,0.35,0.36,0.46],
+    'distilgpt2':              [0.50,0.35,0.43,0.42,0.56,0.21,0.35,0.39,0.47],
+    'facebook/opt-125m':       [0.46,0.45,0.42,0.33,0.53,0.31,0.32,0.36,0.41],
+    'EleutherAI/gpt-neo-125m': [0.54,0.40,0.39,0.45,0.61,0.20,0.38,0.43,0.41],
+    'bigscience/bloom-560m':   [0.49,0.33,0.40,0.38,0.55,0.25,0.43,0.55,0.44],
+  },
+  typo: {'gpt2':0.3625,'distilgpt2':0.2557,'facebook/opt-125m':0.0186,'EleutherAI/gpt-neo-125m':0.2035,'bigscience/bloom-560m':0.0},
+  transparency_checks: {
+    criteria: ['Model\nCard','License','Train\nData','Limits','Use\nCase','Eval\nResults','Carbon'],
+    'gpt2':                    [1,1,1,1,1,1,0],
+    'distilgpt2':              [1,1,1,1,1,1,1],
+    'facebook/opt-125m':       [1,1,1,1,1,1,0],
+    'EleutherAI/gpt-neo-125m': [1,1,1,1,1,1,0],
+    'bigscience/bloom-560m':   [1,1,1,1,1,1,1],
+  },
+  explainability_detail: {
+    'gpt2':                    [0.4618,2.44],
+    'distilgpt2':              [0.4711,2.48],
+    'facebook/opt-125m':       [0.4434,2.32],
+    'EleutherAI/gpt-neo-125m': [0.461, 2.56],
+    'bigscience/bloom-560m':   [0.501, 2.48],
+  },
+  pii_rate: {'gpt2':0.20,'distilgpt2':0.15,'facebook/opt-125m':0.0,'EleutherAI/gpt-neo-125m':0.0,'bigscience/bloom-560m':0.0},
+};
+
+const scores = MODELS.map((m,i) => ({
+  id:m, short:SHORT[m], color:PALETTE[i],
+  trust: parseFloat(PILLARS.reduce((s,p)=>s+WEIGHTS[p]*DATA[p][m],0).toFixed(4))
+})).sort((a,b)=>b.trust-a.trust);
+
+const BASE = {font:{family:'DM Sans, sans-serif',color:'#475569'}, paper_bgcolor:'transparent', plot_bgcolor:'transparent'};
+const AX   = {gridcolor:'#edf0f7',linecolor:'#e2e8f4',tickcolor:'#e2e8f4',zerolinecolor:'#edf0f7',tickfont:{size:11}};
+
+// ── Score strip ──────────────────────────────────────────────────────────
+const strip = document.getElementById('score-strip');
+scores.forEach((s,i) => {
+  strip.innerHTML += `
+    <div class="score-card" style="--c:${s.color}">
+      <div class="sc-label">${s.short}</div>
+      <div class="sc-value">${s.trust.toFixed(4)}</div>
+      <div class="sc-rank">#${i+1} trustworthiness</div>
+    </div>`;
+});
+
+// ── Radar ────────────────────────────────────────────────────────────────
+const P_LABELS = ['Transparency','Fairness','Robustness','Explainability','Privacy'];
+Plotly.newPlot('chart-radar', scores.map(s=>{
+  const vals = PILLARS.map(p=>DATA[p][s.id]);
+  return {
+    type:'scatterpolar', r:[...vals,vals[0]], theta:[...P_LABELS,P_LABELS[0]],
+    fill:'toself', name:s.short,
+    line:{color:s.color,width:2.5}, fillcolor:s.color, opacity:0.22,
+  };
+}),{
+  ...BASE,
+  polar:{bgcolor:'transparent',
+    radialaxis:{visible:true,range:[0,1],tickfont:{size:9},gridcolor:'#dde4f0',linecolor:'#dde4f0'},
+    angularaxis:{tickfont:{size:11},gridcolor:'#dde4f0',linecolor:'#dde4f0'},
+  },
+  showlegend:true, legend:{orientation:'h',y:-0.22,font:{size:11},bgcolor:'transparent'},
+  height:380, margin:{t:12,b:60,l:32,r:32},
+},{displayModeBar:false,responsive:true});
+
+// ── Fairness: sorted bars coloured by distance from 0.5 ──────────────────
+const fairCats  = DATA.fairness_cats.labels;
+// compute mean per category across models
+const catMeans  = fairCats.map((_,i) => ({
+  label: fairCats[i],
+  mean:  MODELS.reduce((s,m)=>s+DATA.fairness_cats[m][i],0)/MODELS.length,
+  idx:   i,
+})).sort((a,b)=>a.mean-b.mean); // worst first
+
+const barColors = catMeans.map(c => {
+  const gap = 0.5 - c.mean;
+  if (gap > 0.2) return '#dc2626';
+  if (gap > 0.1) return '#f97316';
+  if (gap > 0)   return '#d97706';
+  return '#059669';
+});
+
+Plotly.newPlot('chart-fairness',[{
+  type:'bar',
+  x: catMeans.map(c=>c.mean),
+  y: catMeans.map(c=>c.label),
+  orientation:'h',
+  marker:{ color: barColors, opacity: 0.9 },
+  text: catMeans.map(c=>c.mean.toFixed(2)),
+  textposition:'outside', textfont:{size:11},
+}],{
+  ...BASE,
+  shapes:[{type:'line',x0:0.5,x1:0.5,y0:-0.5,y1:8.5,line:{color:'#94a3b8',width:1.5,dash:'dot'}}],
+  annotations:[{x:0.5,y:8.6,text:'random',showarrow:false,font:{size:10,color:'#94a3b8'},xanchor:'center'}],
+  xaxis:{...AX,range:[0,0.75],tickformat:'.2f',title:{text:'Avg fairness score (5 models)',font:{size:11}}},
+  yaxis:{...AX,autorange:'reversed',tickfont:{size:11}},
+  height:300, margin:{t:8,b:52,l:90,r:44},
+},{displayModeBar:false,responsive:true});
+
+// ── Robustness: typo score only, sorted worst→best ────────────────────────
+const typoSorted = MODELS.map(m=>({short:SHORT[m],val:DATA.typo[m],color:DATA.typo[m]<0.05?'#dc2626':DATA.typo[m]<0.25?'#f97316':'#1a56db'}))
+  .sort((a,b)=>a.val-b.val);
+
+Plotly.newPlot('chart-robustness',[{
+  type:'bar',
+  x: typoSorted.map(d=>d.val),
+  y: typoSorted.map(d=>d.short),
+  orientation:'h',
+  marker:{ color: typoSorted.map(d=>d.color), opacity:0.9 },
+  text: typoSorted.map(d=>d.val===0?'COLLAPSE':d.val.toFixed(3)),
+  textposition:'outside', textfont:{size:11, color: typoSorted.map(d=>d.color)},
+}],{
+  ...BASE,
+  shapes:[{type:'rect',x0:0,x1:0.05,y0:-0.5,y1:4.5,fillcolor:'rgba(220,38,38,.06)',line:{width:0}}],
+  xaxis:{...AX,range:[0,0.58],tickformat:'.2f',title:{text:'Typo robustness score',font:{size:11}}},
+  yaxis:{...AX,autorange:'reversed',tickfont:{size:11,family:'DM Mono, monospace'}},
+  height:300, margin:{t:8,b:52,l:90,r:56},
+},{displayModeBar:false,responsive:true});
+
+// ── Transparency: HTML checklist grid ────────────────────────────────────
+const tc = DATA.transparency_checks;
+const criteria = tc.criteria;
+const grid = document.getElementById('check-grid');
+
+// header row
+let html = `<div></div>`; // empty top-left
+criteria.forEach(c => {
+  html += `<div class="check-header">${c.replace(/\n/,'<br>')}</div>`;
+});
+
+// model rows
+MODELS.forEach(m => {
+  html += `<div class="check-row-label" style="font-size:10px">${SHORT[m]}</div>`;
+  tc[m].forEach(v => {
+    html += `<div class="check-cell ${v?'yes':'no'}">${v?'✓':'✗'}</div>`;
+  });
+});
+
+grid.style.gridTemplateColumns = `110px repeat(${criteria.length}, 1fr)`;
+grid.innerHTML = html;
+
+// ── Explainability: scatter ──────────────────────────────────────────────
+Plotly.newPlot('chart-explain', MODELS.map((m,i)=>({
+  type:'scatter', mode:'markers+text',
+  name: SHORT[m],
+  x:[ DATA.explainability_detail[m][0] ],
+  y:[ DATA.explainability_detail[m][1] ],
+  text:[ SHORT[m] ], textposition:'top center',
+  textfont:{ size:10, color: PALETTE[i] },
+  marker:{ color:PALETTE[i], size:14, opacity:0.9, line:{color:'white',width:2} },
+})),{
+  ...BASE,
+  xaxis:{...AX,title:{text:'Mean Gini ← less focused   more focused →',font:{size:10}},range:[0.43,0.515]},
+  yaxis:{...AX,title:{text:'Avg tokens > 10% attribution',font:{size:10}},range:[2.22,2.68]},
+  showlegend:false,
+  height:320, margin:{t:12,b:52,l:68,r:16},
+},{displayModeBar:false,responsive:true});
+
+// ── Privacy: risk rows ───────────────────────────────────────────────────
+const riskRow = document.getElementById('risk-row');
+MODELS.forEach(m => {
+  const rate = DATA.pii_rate[m];
+  const cls  = rate===0 ? 'safe' : rate<=0.15 ? 'warn' : 'danger';
+  const label= rate===0 ? 'No PII generated' : `PII on ${Math.round(rate*100)}% of prompts`;
+  riskRow.innerHTML += `
+    <div class="risk-item ${cls}">
+      <span class="risk-model ${cls}">${SHORT[m]}</span>
+      <div class="risk-right">
+        <span class="risk-label">${label}</span>
+        <span class="risk-badge ${cls}">${rate===0?'✓ CLEAN':rate.toFixed(2)}</span>
+      </div>
+    </div>`;
+});
+</script>
+</body>
+</html>

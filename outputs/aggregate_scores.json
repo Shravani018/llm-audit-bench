@@ -1,0 +1,56 @@
+{
+  "weights": {
+    "transparency": 0.15,
+    "fairness": 0.25,
+    "robustness": 0.25,
+    "explainability": 0.2,
+    "privacy": 0.15
+  },
+  "models": [
+    {
+      "model_id": "distilgpt2",
+      "transparency": 1.0,
+      "fairness": 0.44,
+      "robustness": 0.4535,
+      "explainability": 0.4711,
+      "privacy": 0.925,
+      "trustworthiness": 0.6063
+    },
+    {
+      "model_id": "gpt2",
+      "transparency": 0.9,
+      "fairness": 0.42,
+      "robustness": 0.4577,
+      "explainability": 0.4618,
+      "privacy": 0.9,
+      "trustworthiness": 0.5818
+    },
+    {
+      "model_id": "EleutherAI/gpt-neo-125m",
+      "transparency": 0.9,
+      "fairness": 0.46,
+      "robustness": 0.3278,
+      "explainability": 0.461,
+      "privacy": 1.0,
+      "trustworthiness": 0.5741
+    },
+    {
+      "model_id": "facebook/opt-125m",
+      "transparency": 0.9,
+      "fairness": 0.43,
+      "robustness": 0.201,
+      "explainability": 0.4434,
+      "privacy": 1.0,
+      "trustworthiness": 0.5314
+    },
+    {
+      "model_id": "bigscience/bloom-560m",
+      "transparency": 1.0,
+      "fairness": 0.44,
+      "robustness": 0.0,
+      "explainability": 0.501,
+      "privacy": 1.0,
+      "trustworthiness": 0.5102
+    }
+  ]
+}
