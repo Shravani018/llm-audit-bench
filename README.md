@@ -18,11 +18,10 @@ A modular pipeline that audits 5 small HuggingFace LLMs across transparency, fai
 | Robustness | Perplexity shift under input perturbations |
 | Explainability | SHAP token attribution |
 | Privacy | MIA canary test + PII generation risk |
---
 
 ## Models
 
-`gpt2` `distilgpt2` `facebook/opt-125m` `EleutherAI/gpt-neo-125m` `bigscience/bloom-560m'
+`gpt2` `distilgpt2` `facebook/opt-125m` `EleutherAI/gpt-neo-125m` `bigscience/bloom-560m`
 
 
 ## Dashboard
