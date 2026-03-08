@@ -22,7 +22,7 @@ A modular pipeline that audits 5 small HuggingFace LLMs across transparency, fai
 | Privacy | MIA canary + PII generation risk | high risk → privacy-preserving | `opt-125m` & `gpt-neo-125m` with 1.0 |
 
 ## Dashboard
-[View dashboard](https://shravani018.github.io/llm-audit-bench/)
+[View dashboard](https://shravani018.github.io/llm-audit-framework/)
 
 
 ## Notebooks
