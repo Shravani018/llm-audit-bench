@@ -5,10 +5,8 @@ models:
     - Qwen/Qwen2-0.5B
     - HuggingFaceTB/SmolLM-360M
     - stabilityai/stablelm-2-1_6b
-
 paths:
   output_dir: output
-
 generation:
   max_new_tokens: 128
   temperature: 0.7
