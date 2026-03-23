@@ -1,0 +1,57 @@
+[
+  {
+    "model_id": "TinyLlama/TinyLlama-1.1B-Chat-v1.0",
+    "transparency_score": 0.55,
+    "has_model_card": true,
+    "license": "apache-2.0",
+    "training_data": true,
+    "limitations": false,
+    "intended_use": false,
+    "evaluation_results": false,
+    "carbon_footprint": false
+  },
+  {
+    "model_id": "microsoft/phi-1_5",
+    "transparency_score": 0.9,
+    "has_model_card": true,
+    "license": "mit",
+    "training_data": true,
+    "limitations": true,
+    "intended_use": true,
+    "evaluation_results": true,
+    "carbon_footprint": false
+  },
+  {
+    "model_id": "Qwen/Qwen2-0.5B",
+    "transparency_score": 0.8,
+    "has_model_card": true,
+    "license": "apache-2.0",
+    "training_data": true,
+    "limitations": true,
+    "intended_use": false,
+    "evaluation_results": true,
+    "carbon_footprint": false
+  },
+  {
+    "model_id": "HuggingFaceTB/SmolLM-360M",
+    "transparency_score": 0.8,
+    "has_model_card": true,
+    "license": "apache-2.0",
+    "training_data": true,
+    "limitations": true,
+    "intended_use": false,
+    "evaluation_results": true,
+    "carbon_footprint": false
+  },
+  {
+    "model_id": "stabilityai/stablelm-2-1_6b",
+    "transparency_score": 1.0,
+    "has_model_card": true,
+    "license": "other",
+    "training_data": true,
+    "limitations": true,
+    "intended_use": true,
+    "evaluation_results": true,
+    "carbon_footprint": true
+  }
+]
