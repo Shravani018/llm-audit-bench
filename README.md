@@ -13,7 +13,7 @@ A modular pipeline that audits 5 small HuggingFace LLMs across transparency, fai
 
 ## Models
 
-`TinyLlama/TinyLlama-1.1B-Chat-v1.0`, `microsoft/phi-1_5`, `Qwen/Qwen2-0.5B`, `HuggingFaceTB/SmolLM-360M`, `stabilityai/stablelm-2-1_6b`
+`TinyLlama-1.1B-Chat-v1.0`, `phi-1_5`, `Qwen2-0.5B`, `SmolLM-360M`, `stablelm-2-1_6b`
 
 | Pillar | Method | `0` → `1` |  Best Model |
 |---|---|---|---|
