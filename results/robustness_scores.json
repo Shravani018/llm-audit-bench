@@ -1,0 +1,59 @@
+{
+  "robustness": [
+    {
+      "model_id": "TinyLlama/TinyLlama-1.1B-Chat-v1.0",
+      "robustness_score": 0.4997,
+      "mean_shift": 0.5003,
+      "sentences_tested": 100,
+      "per_perturbation": {
+        "typo": 0.4199,
+        "deletion": 0.5278,
+        "synonym": 0.5513
+      }
+    },
+    {
+      "model_id": "microsoft/phi-1_5",
+      "robustness_score": 0.1924,
+      "mean_shift": 0.8076,
+      "sentences_tested": 100,
+      "per_perturbation": {
+        "typo": 0.1535,
+        "deletion": 0.1471,
+        "synonym": 0.2767
+      }
+    },
+    {
+      "model_id": "Qwen/Qwen2-0.5B",
+      "robustness_score": 0.0761,
+      "mean_shift": 0.9239,
+      "sentences_tested": 100,
+      "per_perturbation": {
+        "typo": 0.0495,
+        "deletion": 0.4411,
+        "synonym": 0.0
+      }
+    },
+    {
+      "model_id": "HuggingFaceTB/SmolLM-360M",
+      "robustness_score": 0.3214,
+      "mean_shift": 0.6786,
+      "sentences_tested": 100,
+      "per_perturbation": {
+        "typo": 0.228,
+        "deletion": 0.3184,
+        "synonym": 0.4178
+      }
+    },
+    {
+      "model_id": "stabilityai/stablelm-2-1_6b",
+      "robustness_score": 0.357,
+      "mean_shift": 0.643,
+      "sentences_tested": 100,
+      "per_perturbation": {
+        "typo": 0.4107,
+        "deletion": 0.3089,
+        "synonym": 0.3514
+      }
+    }
+  ]
+}

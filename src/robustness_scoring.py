@@ -107,21 +107,39 @@ def compute_robustness(model, tokenizer, sentences, device):
 # Evaluating robustness for each model
 def evaluate_robustness(model_id, sentences):
     print(f"\nEvaluating: {model_id}")
-    device="cuda" if torch.cuda.is_available() else "cpu"
-    tokenizer=AutoTokenizer.from_pretrained(model_id)
-    model=AutoModelForCausalLM.from_pretrained(model_id, dtype=torch.float32)
-    model=model.to(device)
-    model.eval()
+    device = "cuda" if torch.cuda.is_available() else "cpu"
+
+    tokenizer = AutoTokenizer.from_pretrained(model_id, trust_remote_code=True)
+
     if tokenizer.pad_token is None:
         tokenizer.pad_token = tokenizer.eos_token
+        tokenizer.pad_token_id = tokenizer.eos_token_id
+
+    from transformers import AutoConfig
+    config = AutoConfig.from_pretrained(model_id, trust_remote_code=True)
+    if not hasattr(config, "pad_token_id") or config.pad_token_id is None:
+        config.pad_token_id = tokenizer.pad_token_id
+
+    model = AutoModelForCausalLM.from_pretrained(
+        model_id,
+        config=config,
+        dtype=torch.float32,
+        trust_remote_code=True
+    )
+    model = model.to(device)
+    model.eval()
+
     robustness_score, mean_shift, per_type = compute_robustness(
         model, tokenizer, sentences, device)
+
     del model
-    torch.cuda.empty_cache() if torch.cuda.is_available() else None
-    print(f"Robustness:{robustness_score}|mean shift: {round(mean_shift, 4)}")
-    print(f"per type:{per_type}")
+    if torch.cuda.is_available():
+        torch.cuda.empty_cache()
+
+    print(f"Robustness: {robustness_score} | mean shift: {round(mean_shift, 4)}")
+    print(f"per type: {per_type}")
     return {
-        "model_id":        model_id,
+        "model_id":         model_id,
         "robustness_score": robustness_score,
         "mean_shift":       round(mean_shift, 4),
         "sentences_tested": len(sentences),
