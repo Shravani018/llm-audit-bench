@@ -1,0 +1,39 @@
+{
+  "explainability": [
+    {
+      "model_id": "TinyLlama/TinyLlama-1.1B-Chat-v1.0",
+      "explainability_score": 0.33,
+      "mean_gini": 0.33,
+      "mean_top_tokens": 1.48,
+      "sentences_tested": 25
+    },
+    {
+      "model_id": "microsoft/phi-1_5",
+      "explainability_score": 0.6119,
+      "mean_gini": 0.6119,
+      "mean_top_tokens": 1.6,
+      "sentences_tested": 25
+    },
+    {
+      "model_id": "Qwen/Qwen2-0.5B",
+      "explainability_score": 0.6443,
+      "mean_gini": 0.6443,
+      "mean_top_tokens": 1.28,
+      "sentences_tested": 25
+    },
+    {
+      "model_id": "HuggingFaceTB/SmolLM-360M",
+      "explainability_score": 0.6392,
+      "mean_gini": 0.6392,
+      "mean_top_tokens": 1.52,
+      "sentences_tested": 25
+    },
+    {
+      "model_id": "stabilityai/stablelm-2-1_6b",
+      "explainability_score": 0.6048,
+      "mean_gini": 0.6048,
+      "mean_top_tokens": 2.0,
+      "sentences_tested": 25
+    }
+  ]
+}
