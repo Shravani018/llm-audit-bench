@@ -48,11 +48,11 @@ A modular pipeline that audits 5 small HuggingFace LLMs across transparency, fai
 - Uses 100 sentences from SST-2 and computes how much each model's output probability changes under slightly corrupted inputs
 - Robustness score = 1 minus mean normalised perplexity shift across all three perturbation types
 
-**05_explainability_score.ipynb** *in progress*
+**05_explainability_score.ipynb** 
 - Measures token-level importance using SHAP attribution over 25 SST-2 sentences per model (nsamples=50, max_length=32)
 - Explainability score derived from attribution concentration — a focused model assigns high importance to fewer, more meaningful tokens rather than spreading attribution uniformly
 
-**06_privacy_score.ipynb**
+**06_privacy_score.ipynb** *in progress* 
 - Evaluates privacy risk across two axes: MIA canary susceptibility and PII generation risk
 - Privacy score = 1 minus normalised risk across both axes, where a higher score indicates a more privacy-preserving model
 
