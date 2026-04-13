@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>LLM Trustworthiness Audit</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/plotly.js/2.27.0/plotly.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;500&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<style>
+:root {
+  --bg:    #f7f6f2;
+  --white: #ffffff;
+  --ink:   #1c1b18;
+  --mid:   #6b6860;
+  --faint: #c8c6c0;
+  --rule:  #e4e2dc;
+  --blue:  #2563eb;
+  --red:   #c0392b;
+  --amber: #b45309;
+  --green: #166534;
+  --gink:  #dcfce7;
+  --rink:  #fee2e2;
+  --aink:  #fef3c7;
+  --mono:  'IBM Plex Mono', monospace;
+  --body:  'IBM Plex Sans', sans-serif;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: var(--body);
+  background: var(--bg);
+  color: var(--ink);
+  line-height: 1.5;
+}
+
+header {
+  background: var(--white);
+  border-bottom: 1px solid var(--rule);
+  padding: 0 48px;
+  height: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 32px;
+  text-align: center;
+}
+.site-title { font-family: var(--body); font-size: 15px; font-weight: 600; letter-spacing: -.01em; }
+.site-sub   { font-family: var(--mono); font-size: 10px; color: var(--mid); margin-top: 1px; }
+.header-note{ font-family: var(--mono); font-size: 10px; color: var(--mid); }
+
+main {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 40px 40px 80px;
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+}
+
+.section-label {
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--mid);
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  border-top: 1px solid var(--rule);
+  padding-top: 10px;
+  margin-bottom: 14px;
+}
+
+/* leaderboard */
+.leader {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 1px;
+  background: var(--rule);
+  border: 1px solid var(--rule);
+  border-radius: 4px;
+  overflow: hidden;
+}
+.lcard {
+  background: var(--white);
+  padding: 26px 24px 22px;
+}
+.lcard-pos  { font-family: var(--mono); font-size: 10px; color: var(--faint); margin-bottom: 10px; }
+.lcard-name { font-size: 11px; font-weight: 500; color: var(--mid); margin-bottom: 14px; line-height: 1.4; font-family: var(--mono); }
+.lcard-score { font-family: var(--mono); font-size: 28px; font-weight: 500; letter-spacing: -.02em; color: var(--ink); line-height: 1; }
+.lcard-bar  { height: 1px; background: var(--rule); margin-top: 14px; }
+.lcard-fill { height: 100%; background: var(--blue); }
+.lcard-dims { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 12px; }
+.dim {
+  font-family: var(--mono); font-size: 9px;
+  padding: 2px 6px; border-radius: 2px;
+  background: var(--bg); color: var(--mid);
+}
+
+.row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+.row3 { display: grid; grid-template-columns: 1.5fr 1fr 1.8fr; gap: 20px; align-items: stretch; }
+
+.card {
+  background: var(--white);
+  border: 1px solid var(--rule);
+  border-radius: 4px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+.card-head { padding: 24px 26px 20px; border-bottom: 1px solid var(--rule); }
+.card-pillar { font-family: var(--mono); font-size: 10px; color: var(--mid); margin-bottom: 8px; }
+.card-title  { font-family: var(--body); font-size: 14px; font-weight: 500; line-height: 1.5; color: var(--ink); }
+.card-note   { font-family: var(--mono); font-size: 10px; color: var(--faint); margin-top: 6px; }
+.chart-area  { padding: 20px; flex: 1; }
+
+/* transparency checklist */
+.tgrid { padding: 22px 26px 26px; display: grid; flex: 1; }
+.tgrid-th {
+  font-family: var(--mono); font-size: 9px; color: var(--mid);
+  text-align: center; padding-bottom: 10px; line-height: 1.5;
+  display: flex; align-items: flex-end; justify-content: center;
+}
+.tgrid-model {
+  font-family: var(--mono); font-size: 10px; color: var(--mid);
+  display: flex; align-items: center; height: 36px; padding-right: 12px;
+}
+.tgrid-cell {
+  height: 36px; margin: 3px; border-radius: 3px;
+  display: flex; align-items: center; justify-content: center; font-size: 13px;
+}
+.tgrid-cell.y { background: var(--gink); color: var(--green); }
+.tgrid-cell.n { background: var(--rink); color: var(--red); }
+
+/* privacy */
+.plist { padding: 20px 26px 26px; display: flex; flex-direction: column; gap: 10px; flex: 1; }
+.pitem {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 12px 16px; border-radius: 3px; border: 1px solid transparent;
+}
+.pitem.clean { background: var(--gink); border-color: #bbf7d0; }
+.pitem.warn  { background: var(--aink); border-color: #fde68a; }
+.pitem.bad   { background: var(--rink); border-color: #fecaca; }
+.pitem-name  { font-family: var(--mono); font-size: 11px; }
+.pitem-name.clean { color: var(--green); }
+.pitem-name.warn  { color: var(--amber); }
+.pitem-name.bad   { color: var(--red); }
+.pitem-right { display: flex; align-items: center; gap: 16px; }
+.pitem-label { font-family: var(--mono); font-size: 10px; color: var(--mid); }
+.pitem-val   { font-family: var(--mono); font-size: 11px; font-weight: 500; }
+.pitem-val.clean { color: var(--green); }
+.pitem-val.warn  { color: var(--amber); }
+.pitem-val.bad   { color: var(--red); }
+
+.foot {
+  font-family: var(--mono); font-size: 10px; color: var(--faint);
+  padding-top: 20px; border-top: 1px solid var(--rule);
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div>
+    <div class="site-title">⚖️ LLM Trustworthiness Audit</div>
+    <div class="site-sub">5 models &nbsp;&middot;&nbsp; 5 pillars &nbsp;&middot;&nbsp; weighted composite score</div>
+  </div>
+  <div class="header-note">T=0.15 &nbsp;F=0.25 &nbsp;R=0.25 &nbsp;E=0.20 &nbsp;P=0.15</div>
+</header>
+
+<main>
+
+  <div>
+    <div class="section-label">Overall ranking</div>
+    <div class="leader" id="leader"></div>
+  </div>
+
+  <div>
+    <div class="section-label">Transparency, privacy, and explainability</div>
+    <div class="row3">
+      <div class="card">
+        <div class="card-head">
+          <div class="card-pillar">Transparency</div>
+          <div class="card-title">Carbon footprint is the one criterion no model consistently discloses. stablelm is the only exception.</div>
+          <div class="card-note">Model card, license, training data, limitations, use case, eval results, carbon.</div>
+        </div>
+        <div id="tgrid" class="tgrid"></div>
+      </div>
+      <div class="card">
+        <div class="card-head">
+          <div class="card-pillar">Privacy</div>
+          <div class="card-title">Memorisation is zero across the board. The risk is generative PII, not data leakage.</div>
+          <div class="card-note">PII rate from 20 prompts designed to elicit personal information.</div>
+        </div>
+        <div class="plist" id="plist"></div>
+      </div>
+      <div class="card">
+        <div class="card-head">
+          <div class="card-pillar">Explainability</div>
+          <div class="card-title">Qwen2 has the most concentrated attribution. TinyLlama spreads weight across many tokens.</div>
+          <div class="card-note">Mean Gini vs. tokens above 10% attribution threshold.</div>
+        </div>
+        <div class="chart-area" id="chart-explain"></div>
+      </div>
+    </div>
+  </div>
+
+  <div>
+    <div class="section-label">Fairness and robustness</div>
+    <div class="row2">
+      <div class="card">
+        <div class="card-head">
+          <div class="card-pillar">Fairness</div>
+          <div class="card-title">Sexual orientation scores fall below 0.25 across all models, well under random chance.</div>
+          <div class="card-note">Average fairness score per category across 5 models. Dotted line marks 0.5.</div>
+        </div>
+        <div class="chart-area" id="chart-fairness"></div>
+      </div>
+      <div class="card">
+        <div class="card-head">
+          <div class="card-pillar">Robustness</div>
+          <div class="card-title">Qwen2 and phi-1.5 are the most fragile. TinyLlama holds up best under all three perturbation types.</div>
+          <div class="card-note">Score per perturbation type: typo, deletion, synonym. Higher is more robust.</div>
+        </div>
+        <div class="chart-area" id="chart-robustness"></div>
+      </div>
+    </div>
+  </div>
+
+  <div>
+    <div class="section-label">Pillar breakdown by model</div>
+    <div class="card">
+      <div class="card-head">
+        <div class="card-pillar">Overview</div>
+        <div class="card-title">No model leads across all five pillars. Robustness and fairness pull every score below 0.5.</div>
+        <div class="card-note">Shaded area shows each model across transparency, fairness, robustness, explainability, and privacy.</div>
+      </div>
+      <div class="chart-area" id="chart-radar"></div>
+    </div>
+  </div>
+
+  <div class="foot">
+    Weights: transparency 15% &nbsp;&middot;&nbsp; fairness 25% &nbsp;&middot;&nbsp; robustness 25% &nbsp;&middot;&nbsp; explainability 20% &nbsp;&middot;&nbsp; privacy 15%
+  </div>
+
+</main>
+
+<script>
+const MODELS = [
+  'stabilityai/stablelm-2-1_6b',
+  'HuggingFaceTB/SmolLM-360M',
+  'microsoft/phi-1_5',
+  'TinyLlama/TinyLlama-1.1B-Chat-v1.0',
+  'Qwen/Qwen2-0.5B',
+];
+const SHORT = {
+  'stabilityai/stablelm-2-1_6b':         'stablelm-2',
+  'HuggingFaceTB/SmolLM-360M':           'SmolLM-360M',
+  'microsoft/phi-1_5':                   'phi-1.5',
+  'TinyLlama/TinyLlama-1.1B-Chat-v1.0': 'TinyLlama',
+  'Qwen/Qwen2-0.5B':                     'Qwen2-0.5B',
+};
+const PILLARS  = ['transparency','fairness','robustness','explainability','privacy'];
+const P_LABELS = ['Transparency','Fairness','Robustness','Explainability','Privacy'];
+const PALETTE  = ['#1c1b18','#2563eb','#6b6860','#059669','#d97706'];
+
+const D = {
+  transparency:   {'stabilityai/stablelm-2-1_6b':1.0,'HuggingFaceTB/SmolLM-360M':0.8,'microsoft/phi-1_5':0.9,'TinyLlama/TinyLlama-1.1B-Chat-v1.0':0.55,'Qwen/Qwen2-0.5B':0.8},
+  fairness:       {'stabilityai/stablelm-2-1_6b':0.37,'HuggingFaceTB/SmolLM-360M':0.43,'microsoft/phi-1_5':0.40,'TinyLlama/TinyLlama-1.1B-Chat-v1.0':0.41,'Qwen/Qwen2-0.5B':0.41},
+  robustness:     {'stabilityai/stablelm-2-1_6b':0.357,'HuggingFaceTB/SmolLM-360M':0.3214,'microsoft/phi-1_5':0.1924,'TinyLlama/TinyLlama-1.1B-Chat-v1.0':0.4997,'Qwen/Qwen2-0.5B':0.0761},
+  explainability: {'stabilityai/stablelm-2-1_6b':0.6048,'HuggingFaceTB/SmolLM-360M':0.6392,'microsoft/phi-1_5':0.6119,'TinyLlama/TinyLlama-1.1B-Chat-v1.0':0.33,'Qwen/Qwen2-0.5B':0.6443},
+  privacy:        {'stabilityai/stablelm-2-1_6b':0.75,'HuggingFaceTB/SmolLM-360M':0.775,'microsoft/phi-1_5':0.85,'TinyLlama/TinyLlama-1.1B-Chat-v1.0':0.875,'Qwen/Qwen2-0.5B':0.725},
+  trust:          {'stabilityai/stablelm-2-1_6b':0.5652,'HuggingFaceTB/SmolLM-360M':0.5519,'microsoft/phi-1_5':0.533,'TinyLlama/TinyLlama-1.1B-Chat-v1.0':0.5072,'Qwen/Qwen2-0.5B':0.4791},
+  pii:            {'stabilityai/stablelm-2-1_6b':0.50,'HuggingFaceTB/SmolLM-360M':0.45,'microsoft/phi-1_5':0.30,'TinyLlama/TinyLlama-1.1B-Chat-v1.0':0.25,'Qwen/Qwen2-0.5B':0.55},
+  fc_labels: ['Race','Socioeconomic','Gender','Disability','Nationality','Sexual orientation','Appearance','Religion','Age'],
+  fc: {
+    'stabilityai/stablelm-2-1_6b':         [0.46,0.31,0.32,0.27,0.45,0.23,0.22,0.36,0.32],
+    'HuggingFaceTB/SmolLM-360M':           [0.48,0.31,0.47,0.35,0.50,0.23,0.37,0.39,0.41],
+    'microsoft/phi-1_5':                   [0.50,0.30,0.37,0.30,0.48,0.19,0.29,0.39,0.36],
+    'TinyLlama/TinyLlama-1.1B-Chat-v1.0': [0.47,0.36,0.47,0.27,0.43,0.19,0.30,0.32,0.37],
+    'Qwen/Qwen2-0.5B':                     [0.48,0.29,0.42,0.32,0.48,0.24,0.30,0.39,0.43],
+  },
+  pert: {
+    'stabilityai/stablelm-2-1_6b':         {typo:0.4107,deletion:0.3089,synonym:0.3514},
+    'HuggingFaceTB/SmolLM-360M':           {typo:0.228, deletion:0.3184,synonym:0.4178},
+    'microsoft/phi-1_5':                   {typo:0.1535,deletion:0.1471,synonym:0.2767},
+    'TinyLlama/TinyLlama-1.1B-Chat-v1.0': {typo:0.4199,deletion:0.5278,synonym:0.5513},
+    'Qwen/Qwen2-0.5B':                     {typo:0.0495,deletion:0.4411,synonym:0.0},
+  },
+  tc: {
+    criteria: ['Model card','License','Training data','Limitations','Use case','Eval results','Carbon'],
+    'stabilityai/stablelm-2-1_6b':         [1,1,1,1,1,1,1],
+    'HuggingFaceTB/SmolLM-360M':           [1,1,1,1,0,1,0],
+    'microsoft/phi-1_5':                   [1,1,1,1,1,1,0],
+    'TinyLlama/TinyLlama-1.1B-Chat-v1.0': [1,1,1,0,0,0,0],
+    'Qwen/Qwen2-0.5B':                     [1,1,1,1,0,1,0],
+  },
+  exp: {
+    'stabilityai/stablelm-2-1_6b':         {gini:0.6048,tokens:2.0},
+    'HuggingFaceTB/SmolLM-360M':           {gini:0.6392,tokens:1.52},
+    'microsoft/phi-1_5':                   {gini:0.6119,tokens:1.6},
+    'TinyLlama/TinyLlama-1.1B-Chat-v1.0': {gini:0.33,  tokens:1.48},
+    'Qwen/Qwen2-0.5B':                     {gini:0.6443,tokens:1.28},
+  },
+};
+
+const ranked = [...MODELS].sort((a,b)=>D.trust[b]-D.trust[a]);
+
+const BASE = {
+  font:{family:'IBM Plex Mono, monospace',color:'#6b6860',size:10},
+  paper_bgcolor:'transparent',
+  plot_bgcolor:'transparent',
+};
+const AX = {
+  gridcolor:'#e4e2dc',linecolor:'#e4e2dc',
+  tickcolor:'#e4e2dc',zerolinecolor:'#e4e2dc',
+  tickfont:{size:10,family:'IBM Plex Mono, monospace',color:'#6b6860'},
+};
+const CFG = {displayModeBar:false,responsive:true};
+
+// leaderboard
+const leader = document.getElementById('leader');
+ranked.forEach((m,i)=>{
+  const s = D.trust[m];
+  leader.innerHTML += `
+    <div class="lcard">
+      <div class="lcard-pos">${['1st','2nd','3rd','4th','5th'][i]}</div>
+      <div class="lcard-name">${SHORT[m]}</div>
+      <div class="lcard-score">${s.toFixed(4)}</div>
+      <div class="lcard-bar"><div class="lcard-fill" style="width:${(s*100).toFixed(1)}%"></div></div>
+      <div class="lcard-dims">
+        ${PILLARS.map(p=>`<span class="dim">${p[0].toUpperCase()}=${D[p][m].toFixed(2)}</span>`).join('')}
+      </div>
+    </div>`;
+});
+
+// radar
+Plotly.newPlot('chart-radar',
+  ranked.map((m,i)=>{
+    const vals = PILLARS.map(p=>D[p][m]);
+    return {
+      type:'scatterpolar',
+      r:[...vals,vals[0]],theta:[...P_LABELS,P_LABELS[0]],
+      fill:'toself',name:SHORT[m],
+      line:{color:PALETTE[i],width:1.5},
+      fillcolor:PALETTE[i],opacity:.12,
+    };
+  }),
+{
+  ...BASE,
+  polar:{
+    bgcolor:'transparent',
+    radialaxis:{visible:true,range:[0,1],gridcolor:'#e4e2dc',linecolor:'#e4e2dc',tickfont:{size:9},tickformat:'.1f'},
+    angularaxis:{tickfont:{size:11,family:'IBM Plex Mono, monospace',color:'#6b6860'},gridcolor:'#e4e2dc',linecolor:'#e4e2dc'},
+  },
+  showlegend:true,
+  legend:{orientation:'h',y:-0.16,font:{size:10,family:'IBM Plex Mono, monospace',color:'#6b6860'},bgcolor:'transparent'},
+  height:380,margin:{t:20,b:60,l:40,r:40},
+},CFG);
+
+// fairness
+const catMeans = D.fc_labels.map((lbl,i)=>({
+  label:lbl,
+  mean: MODELS.reduce((s,m)=>s+D.fc[m][i],0)/MODELS.length,
+})).sort((a,b)=>a.mean-b.mean);
+
+Plotly.newPlot('chart-fairness',[{
+  type:'bar',orientation:'h',
+  x:catMeans.map(c=>c.mean),
+  y:catMeans.map(c=>c.label),
+  marker:{color:catMeans.map(c=>c.mean<0.3?'#c0392b':c.mean<0.45?'#b45309':'#166534'),opacity:.8},
+  text:catMeans.map(c=>c.mean.toFixed(3)),
+  textposition:'outside',
+  textfont:{size:10,color:'#6b6860',family:'IBM Plex Mono, monospace'},
+}],{
+  ...BASE,
+  shapes:[{type:'line',x0:.5,x1:.5,y0:-.5,y1:8.5,line:{color:'#c8c6c0',width:1,dash:'dot'}}],
+  annotations:[{x:.5,y:9.1,text:'random',showarrow:false,font:{size:9,color:'#c8c6c0',family:'IBM Plex Mono, monospace'},xanchor:'center'}],
+  xaxis:{...AX,range:[0,.65],tickformat:'.2f'},
+  yaxis:{...AX,autorange:'reversed'},
+  height:300,margin:{t:24,b:28,l:130,r:54},
+},CFG);
+
+// robustness
+const rob = [...MODELS].sort((a,b)=>D.robustness[a]-D.robustness[b]);
+Plotly.newPlot('chart-robustness',
+  ['typo','deletion','synonym'].map((pt,pi)=>({
+    type:'bar',name:pt,orientation:'h',
+    x:rob.map(m=>D.pert[m][pt]),
+    y:rob.map(m=>SHORT[m]),
+    marker:{color:['#c0392b','#6b6860','#2563eb'][pi],opacity:.75},
+    text:rob.map(m=>D.pert[m][pt]===0?'0':D.pert[m][pt].toFixed(3)),
+    textposition:'outside',
+    textfont:{size:9,color:'#6b6860',family:'IBM Plex Mono, monospace'},
+  })),
+{
+  ...BASE,
+  barmode:'group',
+  xaxis:{...AX,range:[0,.7],tickformat:'.2f'},
+  yaxis:{...AX,autorange:'reversed',tickfont:{size:10,family:'IBM Plex Mono, monospace',color:'#6b6860'}},
+  legend:{orientation:'h',y:-0.2,font:{size:10,family:'IBM Plex Mono, monospace',color:'#6b6860'},bgcolor:'transparent'},
+  height:300,margin:{t:8,b:44,l:90,r:54},
+},CFG);
+
+// transparency
+const tc = D.tc;
+const grid = document.getElementById('tgrid');
+grid.style.gridTemplateColumns = `110px repeat(${tc.criteria.length},1fr)`;
+let html = '<div></div>';
+tc.criteria.forEach(c=>{ html+=`<div class="tgrid-th">${c}</div>`; });
+ranked.forEach(m=>{
+  html+=`<div class="tgrid-model">${SHORT[m]}</div>`;
+  tc[m].forEach(v=>{ html+=`<div class="tgrid-cell ${v?'y':'n'}">${v?'&#10003;':'&#10007;'}</div>`; });
+});
+grid.innerHTML = html;
+
+// privacy
+const plist = document.getElementById('plist');
+[...MODELS].sort((a,b)=>D.pii[a]-D.pii[b]).forEach(m=>{
+  const r = D.pii[m];
+  const cls = r<=0.25?'clean':r<=0.35?'warn':'bad';
+  plist.innerHTML += `
+    <div class="pitem ${cls}">
+      <span class="pitem-name ${cls}">${SHORT[m]}</span>
+      <div class="pitem-right">
+        <span class="pitem-label">${r===0?'no PII':'PII on '+Math.round(r*100)+'% of prompts'}</span>
+        <span class="pitem-val ${cls}">${r===0?'clean':r.toFixed(2)}</span>
+      </div>
+    </div>`;
+});
+
+// explainability
+Plotly.newPlot('chart-explain',
+  MODELS.map((m,i)=>({
+    type:'scatter',mode:'markers+text',
+    name:SHORT[m],
+    x:[D.exp[m].gini],
+    y:[D.exp[m].tokens],
+    text:[SHORT[m]],textposition:'top center',
+    textfont:{size:9,color:PALETTE[i],family:'IBM Plex Mono, monospace'},
+    marker:{color:PALETTE[i],size:10,opacity:.9,line:{color:'#fff',width:1.5}},
+  })),
+{
+  ...BASE,
+  xaxis:{...AX,title:{text:'Mean Gini (higher = more focused)',font:{size:10}},range:[0.28,.68]},
+  yaxis:{...AX,title:{text:'Avg tokens above 10%',font:{size:10}},range:[1.1,2.2]},
+  showlegend:false,
+  height:300,margin:{t:12,b:52,l:68,r:16},
+},CFG);
+</script>
+</body>
+</html>
