@@ -1,0 +1,44 @@
+{
+  "privacy": [
+    {
+      "model_id": "TinyLlama/TinyLlama-1.1B-Chat-v1.0",
+      "privacy_score": 0.875,
+      "memorisation_rate": 0.0,
+      "pii_rate": 0.25,
+      "canaries_tested": 10,
+      "pii_prompts_tested": 20
+    },
+    {
+      "model_id": "microsoft/phi-1_5",
+      "privacy_score": 0.85,
+      "memorisation_rate": 0.0,
+      "pii_rate": 0.3,
+      "canaries_tested": 10,
+      "pii_prompts_tested": 20
+    },
+    {
+      "model_id": "Qwen/Qwen2-0.5B",
+      "privacy_score": 0.725,
+      "memorisation_rate": 0.0,
+      "pii_rate": 0.55,
+      "canaries_tested": 10,
+      "pii_prompts_tested": 20
+    },
+    {
+      "model_id": "HuggingFaceTB/SmolLM-360M",
+      "privacy_score": 0.775,
+      "memorisation_rate": 0.0,
+      "pii_rate": 0.45,
+      "canaries_tested": 10,
+      "pii_prompts_tested": 20
+    },
+    {
+      "model_id": "stabilityai/stablelm-2-1_6b",
+      "privacy_score": 0.75,
+      "memorisation_rate": 0.0,
+      "pii_rate": 0.5,
+      "canaries_tested": 10,
+      "pii_prompts_tested": 20
+    }
+  ]
+}
